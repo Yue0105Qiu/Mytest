@@ -1,1 +1,14 @@
-This is a test for using git in linux to connect with Github.com 
+This repository contains simple examples for using git with GitHub on Linux.
+
+## Contents
+- `multiphase_solver.py`: A Cantera-based zero-dimensional solver for gas/solid
+  multi-phase systems. It loads mechanism files for each phase and integrates the
+  reactor network.
+- `MytestNew2/MytestNew3/sample3.C`: Example C program used for testing.
+
+## Usage
+```
+python multiphase_solver.py GAS_MECH SOLID_MECH [END_TIME]
+```
+`GAS_MECH` and `SOLID_MECH` are the mechanism YAML or CTI files describing the
+thermodynamic and kinetic data for each phase.
