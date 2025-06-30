@@ -1,9 +1,9 @@
 This repository contains simple examples for using git with GitHub on Linux.
 
 ## Contents
-- `multiphase_solver.py`: A Cantera-based zero-dimensional solver for gas/solid
-  multi-phase systems. It loads mechanism files for each phase and integrates the
-  reactor network.
+ - `multiphase_solver.py`: A Cantera-based zero-dimensional solver for gas/solid
+   multi-phase systems. It now tracks gas and solid phases separately,
+   enabling simulations of coupled chemistry such as pyrolysis.
 - `MytestNew2/MytestNew3/sample3.C`: Example C program used for testing.
 
 ## Usage
@@ -11,4 +11,6 @@ This repository contains simple examples for using git with GitHub on Linux.
 python multiphase_solver.py GAS_MECH SOLID_MECH [END_TIME]
 ```
 `GAS_MECH` and `SOLID_MECH` are the mechanism YAML or CTI files describing the
-thermodynamic and kinetic data for each phase.
+thermodynamic and kinetic data for each phase. The script prints the final state
+of the gas and solid separately, which is useful for validating pyrolysis
+mechanisms.
