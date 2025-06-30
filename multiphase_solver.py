@@ -3,7 +3,8 @@ import cantera as ct
 
 
 def run_solver(gas_mech, solid_mech, t_end=1.0, dt=1e-5):
-    """Run a zero-dimensional multiphase reactor simulation.
+    """Run a zero-dimensional multiphase reactor simulation with support for
+    coupled solid/gas chemistry (e.g. pyrolysis).
 
     Parameters
     ----------
@@ -16,7 +17,9 @@ def run_solver(gas_mech, solid_mech, t_end=1.0, dt=1e-5):
     dt : float, optional
         Time step for saving data [s]. Default is 1e-5 seconds.
     """
-    # Create gas and solid phase objects
+    # Create gas and solid phase objects. Both phases are coupled through a
+    # ``MultiPhase`` object so that they share the same temperature while
+    # allowing separate sets of species.
     gas = ct.Solution(gas_mech)
     solid = ct.Solution(solid_mech)
 
@@ -29,14 +32,18 @@ def run_solver(gas_mech, solid_mech, t_end=1.0, dt=1e-5):
 
     sim = ct.ReactorNet([reactor])
 
-    states = ct.SolutionArray(mix, extra=['time'])
+    # Store the state of each phase separately so that species mass fractions
+    # can be analysed for the gas and solid individually.
+    gas_states = ct.SolutionArray(gas, extra=['time'])
+    solid_states = ct.SolutionArray(solid, extra=['time'])
 
     time = 0.0
     while time < t_end:
         time = sim.step()
-        states.append(mix.state, time=time)
+        gas_states.append(gas.state, time=time)
+        solid_states.append(solid.state, time=time)
 
-    return states
+    return gas_states, solid_states
 
 
 def main():
@@ -48,16 +55,15 @@ def main():
     solid_mech = sys.argv[2]
     t_end = float(sys.argv[3]) if len(sys.argv) > 3 else 1.0
 
-    data = run_solver(gas_mech, solid_mech, t_end=t_end)
+    gas_states, solid_states = run_solver(gas_mech, solid_mech, t_end=t_end)
 
-    # Print final state of each phase
+    # Print final state of each phase. Accessing the last entry of the arrays
+    # yields the solution objects for each phase.
     print('Final gas state:')
-    gas = data[-1].solution
-    print(gas())
+    print(gas_states[-1]())
 
     print('\nFinal solid state:')
-    solid = data[-1].adjacent[1]
-    print(solid())
+    print(solid_states[-1]())
 
 
 if __name__ == '__main__':
